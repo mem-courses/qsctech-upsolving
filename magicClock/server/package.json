@@ -1,0 +1,15 @@
+{
+  "name": "achieve_sys",
+  "version": "1.0.0",
+  "description": "achievement system for sundial task",
+  "main": "achieveSys.js",
+  "scripts": {
+    "start": "node achieveSys.js"
+  },
+  "author": "Winfred",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "fs": "^0.0.1-security"
+  }
+}

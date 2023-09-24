@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="authoring-tool" content="Adobe_Animate_CC">
+<title>oneDayOfTown</title>
+<script type='text/javascript' src='./src/api.js'></script>
+<script>
+
+//以下五个函数是用于控制时间的api，请在magicClock.js中使用它们
+function getTime(){
+	//传递给成就系统
+	if(!hasRequest.getTime){
+		triggerAchievement(APIName.GetTime);
+		hasRequest.getTime=true;
+	}
+	const curTime=_apiSet.getCurrentFrame()/TotalFrame*24;
+	let h=Math.floor(curTime);
+	const m=Math.floor((curTime-h)*60);
+	h+=StartFrameHour;
+	if(h>=24) h-=24;
+	return `${((h<10)?"0":"")}${h}:${((m<10)?"0":"")}${m}`;
+}
+
+function setTime(timeStr){
+	//传递给成就系统
+	if(!hasRequest.setTime){
+		triggerAchievement(APIName.SetTime);
+		hasRequest.setTime=true;
+	}
+	const str=timeStr.split(":");
+	if(str.length<2) return false;
+	let h=parseInt(str[0]);
+	
+	//传递给combo彩蛋判定
+	if(!_apiSet.isPlaying) comboJudgeEntry(h);
+
+	//加上初始帧的小时偏转
+	h-=StartFrameHour;
+	if(h<0) h+=24;
+	let frame=Math.floor(( h + parseInt(str[1])/60 ) /24 * TotalFrame);
+	if(_apiSet.isPlaying) _apiSet.gotoAndPlay(frame);
+	else _apiSet.gotoAndStop(frame);
+	return true;
+}
+
+function meltTime(){
+	if(!_apiSet.isPlaying){
+		_apiSet.play();
+		_apiSet.isPlaying=true;
+	}
+}
+
+function freezeTime(){
+	//传递给成就系统
+	if(!hasRequest.freezeTime){
+		triggerAchievement(APIName.FreezeTime);
+		hasRequest.freezeTime=true;
+	}
+
+	if(_apiSet.isPlaying){
+		_apiSet.stop();
+		_apiSet.isPlaying=false;
+	}
+}
+
+function getIsTimePassing(){
+	return _apiSet.isPlaying;
+}
+
+</script>
+</head>
+
+
+<body style="margin:0px; background-color: #121212;">
+	<div id="animation_container" style="background-color:rgba(51, 51, 51, 1.00); width:800px; height:800px">
+		<canvas id="AniamteCanvas" width="800" height="800" style="position: absolute; display: block; background-color:rgba(51, 51, 51, 1.00);"></canvas>
+		<img id="StartButton" src="./src/startButton.svg" alt="开始播放"/>
+		<div class="chatBox"> </div>
+	</div>
+	<script src="./src/oneDayOfTown.js"></script>
+	<script src="./src/dialogMachine.js"></script>
+
+	<!--如果有更精美的日晷，可以在src替换图片~ 但要注意，需要在magicClock.js中合理安排其绘制位置 !-->
+	<!--欢迎以其他的方式制作日晷，如svg等等!-->
+	<div id="MyClock">
+		<canvas id="ClockCanvas"> </canvas>
+	</div>
+	
+	<!--请在magicClock.js操控id为ClockCanvas的画布，并利用getTime,setTime等方法，完成日晷(时钟)的绘制和操控逻辑 !-->
+	<script src="magicClock.js"></script>
+
+</body>
+<style>
+
+	body{
+		text-align: center;
+	}
+
+	#animation_container{
+		position: relative;
+		display:inline-block;
+		vertical-align: middle;
+	}
+
+	#MyClock{
+		position: relative;
+		display: inline-block;
+		vertical-align: middle;
+	}
+
+	.chatBox{
+		position: absolute;
+		bottom:30%;
+		left: 50%;
+		translate: -50% 0px;
+		display: flex;
+		flex-direction:column;
+		
+		margin: auto;
+		color: rgb(0, 0, 0);
+		font-family: "Microsoft","Yahei SimHei";
+
+		min-width: 200px;
+	}
+
+	.chatCloudLeft,.chatCloudRight{
+		position: relative;
+		display: flex;
+		border-radius: 3px;
+		background:rgba(255, 255, 255, 0.8);
+
+		margin-top: 10px;
+
+		
+		font-size: 16px;
+		transition:all 0.8s ease-out;
+		min-width: 100px;
+	}
+
+	.chatCloudLeft{
+		margin-right: auto;
+		flex-direction: row;
+		margin-left: -40px;
+	}
+	.chatCloudRight{
+		margin-left: auto;
+		flex-direction: row-reverse;
+		margin-right: -40px;
+	}
+
+	.chatName{
+		border-radius: 3px;
+		background-color: rgba(255, 255, 255, 0.4);
+		font-weight: bolder;
+		
+		padding-left: 10px;
+		padding-right: 10px;
+		
+		padding-top: 4px;
+		padding-bottom: 4px;
+
+		text-align: center;
+		overflow: hidden;
+		white-space: nowrap;
+		min-width: 80px;
+		font-size: 18px;
+	}
+	
+	.chatContentLeft,.chatContentRight{
+		padding-left: 10px;
+		padding-right: 10px;
+		max-width: 450px;
+		min-width: 100px;
+		overflow-wrap: anywhere;
+	}
+
+	.chatContentRight{
+		text-align: left;
+	}
+	.chatContentLeft{
+		text-align: left;
+	}
+
+	#StartButton{
+		position:absolute;
+		top:50%;
+		left: 50%;
+		width: 200px;
+		height: 200px;
+		opacity: 0.8;
+		translate: -50% -50%;
+	}
+	
+</style>
+</html>
