@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" />
+    <meta name="renderer" content="webkit" />
+    <meta name="force-rendering" content="webkit" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css" />
+    <title>Markdown Editor - memset0</title>
+
+    <style>
+      #markdown {
+        width: 100%;
+      }
+      #editor,
+      #preview {
+        box-sizing: border-box;
+        display: block;
+        width: 50% !important;
+        height: 600px !important;
+        float: left;
+        padding: 20px;
+      }
+      #editor {
+        font-family: Consolas, monospace;
+      }
+      #preview {
+        overflow-y: scroll;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="markdown">
+      <textarea id="editor" class="mdui-textfield-input"></textarea>
+      <div id="preview" class="mdui-typo"></div>
+    </div>
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <script src="./markdown-editor.js"></script>
+    <script>
+      MDE.install(document.getElementById('editor'), document.getElementById('preview'));
+    </script>
+  </body>
+</html>
