@@ -12,6 +12,14 @@ $$
 test p1
 test p2
 test p3
+- Level 1
+  more lines in sample level
+- Level 1
+  - Level 2
+    - Level 3
+      - Level 4
+  - Level 2
+  - Level 2
 > This is a \`blockquote\`.
 > more lines...
 > > This is a \`blockquote\` inside another \`blockquote\`
@@ -74,6 +82,79 @@ class MarkdownEditor {
             text: lines.slice(i + 1, j).join('\n'),
           });
         }
+      }
+
+      if (line.startsWith('- ') || line.startsWith('* ')) {
+        const isList = (line) => {
+          let count = 1;
+          while (line.startsWith('  ')) {
+            line = line.slice(2);
+            count++;
+          }
+          if (line.startsWith('- ') || line.startsWith('* ')) {
+            return count;
+          } else {
+            return -1;
+          }
+        };
+        const cached = [
+          {
+            level: 1,
+            lines: [line],
+          },
+        ];
+        while (j + 1 < lines.length) {
+          let level = isList(lines[j + 1]);
+          if (level != -1) {
+            j++;
+            cached.push({
+              level,
+              lines: [lines[j]],
+            });
+          } else {
+            let followed = true;
+            const level = cached[cached.length - 1].level;
+            for (let k = 0; k < level; k++) {
+              if (lines[j + 1][k * 2] != ' ' || lines[j + 1][k * 2 + 1] != ' ') {
+                followed = false;
+                break;
+              }
+            }
+            if (followed) {
+              j++;
+              cached[cached.length - 1].lines.push(lines[j]);
+            } else {
+              break;
+            }
+          }
+        }
+        for (const cacheBlock of cached) {
+          const level = isList(cacheBlock.lines[0]);
+          for (let k = 0; k < cacheBlock.lines.length; k++) {
+            cacheBlock.lines[k] = cacheBlock.lines[k].slice(level * 2);
+          }
+          cacheBlock.text = this.renderInlineContent(cacheBlock.lines.join('<br>'));
+        }
+        console.log(cached);
+        function solve(l, r, level) {
+          const result = {
+            tag: 'ul',
+            children: [],
+          };
+          for (let ll = l, rr = l; ll <= r; ll = rr + 1, rr = ll) {
+            while (rr + 1 <= r && cached[rr + 1].level > level) ++rr;
+            result.children.push({
+              tag: 'li',
+              text: cached[ll].text,
+            });
+            if (ll < rr) {
+              result.children[result.children.length - 1].children = [solve(ll + 1, rr, level + 1)];
+            }
+          }
+          return result;
+        }
+        result.push(solve(0, cached.length - 1, 1));
+        continue;
       }
 
       if (line) {
