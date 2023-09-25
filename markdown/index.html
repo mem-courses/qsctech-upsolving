@@ -7,6 +7,7 @@
     <meta name="force-rendering" content="webkit" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css" />
+    <link href="http://cdn.bootcss.com/KaTeX/0.10.1/katex.min.css" rel="stylesheet" />
     <title>Markdown Editor - memset0</title>
 
     <style>
@@ -36,7 +37,9 @@
       <textarea id="editor" class="mdui-textfield-input"></textarea>
       <div id="preview" class="mdui-typo"></div>
     </div>
+
     <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <script src="https://cdn.bootcss.com/KaTeX/0.10.1/katex.min.js"></script>
     <script src="./markdown-editor.js"></script>
     <script>
       MDE.install(document.getElementById('editor'), document.getElementById('preview'));

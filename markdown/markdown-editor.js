@@ -4,6 +4,10 @@ const sample = `
 test **bold**
 test *itatic*
 test \`code\`
+test inline math $\\varphi(x)$，$a_{i,j}$。
+$$
+(a+b)^n = \\sum_{i=0}^n \\binom{n}{i} a^{n-i} b^i
+$$
 ## Title 3
 test p1
 test p2
@@ -24,6 +28,7 @@ class MarkdownEditor {
     line = line.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
     line = line.replace(/\*(.*?)\*/g, '<i>$1</i>');
     line = line.replace(/\`(.*?)\`/g, '<code>$1</code>');
+    line = line.replace(/\$(.*?)\$/g, '<katex-inline>$1</katex-inline>');
     return line;
   }
 
@@ -58,6 +63,19 @@ class MarkdownEditor {
         continue;
       }
 
+      if (line.startsWith('$$')) {
+        while (j + 1 < lines.length && !lines[j + 1].startsWith('$$')) ++j;
+        if (j + 1 == lines.length) {
+          j = i; // 说明不是 LaTeX 公式
+        } else {
+          ++j;
+          result.push({
+            tag: 'katex',
+            text: lines.slice(i + 1, j).join('\n'),
+          });
+        }
+      }
+
       if (line) {
         result.push({
           tag: 'p',
@@ -90,6 +108,15 @@ class MarkdownEditor {
     walk(vdomtree);
     console.log('result:', result);
     $root.innerHTML = result;
+
+    if (window.katex) {
+      for (const $e of $root.getElementsByTagName('katex-inline')) {
+        katex.render($e.innerText, $e, { displayMode: false, throwOnError: false });
+      }
+      for (const $e of $root.getElementsByTagName('katex')) {
+        katex.render($e.innerText, $e, { displayMode: true, throwOnError: false });
+      }
+    }
   }
 
   render() {
