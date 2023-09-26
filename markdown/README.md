@@ -1,8 +1,8 @@
 # Markdown
 
-[demo](https://memset0.github.io/qsctech-problems-upsolving/markdown/)
+[DEMO](https://memset0.github.io/qsctech-problems-upsolving/markdown/)
 
-设计实现一个 Markdown 编辑器。
+设计实现一个 Markdown 编辑器。点击右上角 `加载示例` 加载测试代码。
 
 ## 支持的 Markdown 语法
 
@@ -12,7 +12,3 @@
 [x] 数学公式
 [x] 引用块（blockquote）
 [x] 无序列表
-
-需要注意的是：
-
-- 与传统 Markdown 不同，只需一个换行符即可实现换行。

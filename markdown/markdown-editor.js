@@ -145,10 +145,32 @@ window.MarkdownEditor = class {
           tag: 'p',
           text: this.renderInlineContent(line),
         });
+      } else {
+        result.push({
+          tag: 'blank-line',
+        });
       }
     }
 
-    return result;
+    const finalResult = [];
+    for (let l = 0, r = 0; l < result.length; l = r + 1, r = l) {
+      if (result[l].tag == 'blank-line') {
+        continue;
+      }
+      if (result[l].tag == 'p') {
+        while (r + 1 < result.length && result[r + 1].tag == 'p') {
+          ++r;
+        }
+        for (let i = l + 1; i <= r; i++) {
+          result[l].text += '<br>';
+          result[l].text += result[i].text;
+        }
+      }
+      console.log(l, r);
+      finalResult.push(result[l]);
+    }
+
+    return finalResult;
   }
 
   renderDOM($root, vdomtree) {
