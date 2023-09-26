@@ -23,10 +23,10 @@ window.MarkdownEditor = class {
     line = line.replace(/\$(.*?)\$/g, '<katex-inline>$1</katex-inline>');
 
     if (line.startsWith('[ ] ')) {
-      line = '<input type="checkbox" disabled> '+ line.slice(4);
+      line = '<input type="checkbox" disabled> ' + line.slice(4);
     }
     if (line.startsWith('[x] ')) {
-      line = '<input type="checkbox" checked disabled> '+ line.slice(4);
+      line = '<input type="checkbox" checked disabled> ' + line.slice(4);
     }
 
     return line;
@@ -66,7 +66,7 @@ window.MarkdownEditor = class {
       if (line.startsWith('$$')) {
         while (j + 1 < lines.length && !lines[j + 1].startsWith('$$')) ++j;
         if (j + 1 == lines.length) {
-          j = i; // 说明不是 LaTeX 公式
+          j = i;
         } else {
           ++j;
           result.push({
@@ -74,6 +74,26 @@ window.MarkdownEditor = class {
             text: lines.slice(i + 1, j).join('\n'),
           });
         }
+        continue;
+      }
+
+      if (line.startsWith('```')) {
+        while (j + 1 < lines.length && !lines[j + 1].startsWith('```')) ++j;
+        if (j + 1 == lines.length) {
+          j = i;
+        } else {
+          ++j;
+          result.push({
+            tag: 'pre',
+            children: [
+              {
+                tag: 'code',
+                text: lines.slice(i + 1, j).join('\n'),
+              },
+            ],
+          });
+        }
+        continue;
       }
 
       if (line.startsWith('- ') || line.startsWith('* ')) {

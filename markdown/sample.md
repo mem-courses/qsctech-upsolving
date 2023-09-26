@@ -18,7 +18,7 @@
 [ ] 未完成的任务计划
 [x] 已完成的任务计划
 
-### 数学公式
+## 数学公式和引用块混排演示
 
 > **拓展拉格朗日反演**
 > 
@@ -27,6 +27,18 @@
 > $$
 > [x^n]h(f(x)) = \dfrac{1}{n}[x^{-1}]h'(x)\left(\frac{x}{g(x)}\right)^n
 > $$
+
+## 代码块演示
+
+```
+#include <bits/stdc++.h>
+using namespace std;
+int main() {
+  int a, b;
+  cin >> a >> b;
+  cout << a + b << endl;;
+}
+```
 
 ## 无序列表演示
 
