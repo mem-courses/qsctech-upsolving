@@ -18,8 +18,17 @@ window.MarkdownEditor = class {
     line = line.replace(/\*\*\*(.*?)\*\*\*/g, '<b><i>$1</i></b>');
     line = line.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
     line = line.replace(/\*(.*?)\*/g, '<i>$1</i>');
+    line = line.replace(/\~\~(.*?)\~\~/g, '<strike>$1</strike>');
     line = line.replace(/\`(.*?)\`/g, '<code>$1</code>');
     line = line.replace(/\$(.*?)\$/g, '<katex-inline>$1</katex-inline>');
+
+    if (line.startsWith('[ ] ')) {
+      line = '<input type="checkbox" disabled> '+ line.slice(4);
+    }
+    if (line.startsWith('[x] ')) {
+      line = '<input type="checkbox" checked disabled> '+ line.slice(4);
+    }
+
     return line;
   }
 
