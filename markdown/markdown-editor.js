@@ -88,7 +88,13 @@ window.MarkdownEditor = class {
             children: [
               {
                 tag: 'code',
-                text: lines.slice(i + 1, j).join('\n'),
+                text: lines
+                  .slice(i + 1, j)
+                  .join('\n')
+                  .replace(/\"/g, '&quot;')
+                  .replace(/\&/g, '&amp;')
+                  .replace(/\</g, '&lt;')
+                  .replace(/\>/g, '&gt;'),
               },
             ],
           });
