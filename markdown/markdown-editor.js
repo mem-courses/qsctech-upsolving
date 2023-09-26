@@ -1,36 +1,19 @@
-const sample = `
-# Hello, World
-## Title 2
-test **bold**
-test *itatic*
-test \`code\`
-test inline math $\\varphi(x)$，$a_{i,j}$。
-$$
-(a+b)^n = \\sum_{i=0}^n \\binom{n}{i} a^{n-i} b^i
-$$
-## Title 3
-test p1
-test p2
-test p3
-- Level 1
-  more lines in sample level
-- Level 1
-  - Level 2
-    - Level 3
-      - Level 4
-  - Level 2
-  - Level 2
-> This is a \`blockquote\`.
-> more lines...
-> > This is a \`blockquote\` inside another \`blockquote\`
-> > more lines...
-> > more lines...
-> > more lines...
-`.trim();
+window.MarkdownEditor = class {
+  HEADING_PREFIX = ['# ', '## ', '### ', '#### ', '##### ', '###### '];
 
-const HEADING_PREFIX = ['# ', '## ', '### ', '#### ', '##### ', '###### '];
+  pullFromCache() {
+    return localStorage.getItem('MDE') || '';
+  }
 
-class MarkdownEditor {
+  pushToCache(content) {
+    localStorage.setItem('MDE', content);
+  }
+
+  setContent(content) {
+    this.$editor.value = content;
+    this.render();
+  }
+
   renderInlineContent(line) {
     line = line.replace(/\*\*\*(.*?)\*\*\*/g, '<b><i>$1</i></b>');
     line = line.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
@@ -48,7 +31,7 @@ class MarkdownEditor {
 
       let flag = false;
       for (let k = 0; k < 6; k++)
-        if (line.startsWith(HEADING_PREFIX[k])) {
+        if (line.startsWith(this.HEADING_PREFIX[k])) {
           result.push({
             tag: 'h' + (k + 1),
             text: this.renderInlineContent(line.slice(k + 2)),
@@ -201,20 +184,33 @@ class MarkdownEditor {
   }
 
   render() {
+    console.log(this._IsRendering, this._NeedRender);
     if (this.$editor === null || this.$preview === null) {
       throw new Error('Markdown Editor is not installed.');
     }
-    const content = this.$editor.value;
-    const vdomtree = this.renderContent(content.split('\n'));
-    console.log('vdomtree:', vdomtree);
-    this.renderDOM(this.$preview, vdomtree);
+    if (this._IsRenderinging) {
+      this._NeedRender = true;
+      return;
+    }
+    this._IsRendering = true;
+    do {
+      this._NeedRender = false;
+      const content = this.$editor.value;
+      this.pushToCache(content);
+      const vdomtree = this.renderContent(content.split('\n'));
+      console.log('vdomtree:', vdomtree);
+      this.renderDOM(this.$preview, vdomtree);
+    } while (this._NeedRender);
+    this._IsRendering = false;
   }
 
   install($editor, $preview) {
     this.$editor = $editor;
     this.$preview = $preview;
-
-    this.$editor.value = sample;
+    this.$editor.addEventListener('input', () => {
+      this.render();
+    });
+    this.$editor.value = this.pullFromCache();
     this.render();
   }
 
@@ -222,6 +218,6 @@ class MarkdownEditor {
     this.$editor = null;
     this.$preview = null;
   }
-}
+};
 
-window.MDE = new MarkdownEditor();
+window.MDE = new window.MarkdownEditor();

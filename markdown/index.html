@@ -11,15 +11,20 @@
     <title>Markdown Editor - memset0</title>
 
     <style>
+      html,
+      body {
+        height: 100%;
+      }
       #markdown {
         width: 100%;
+        height: calc(100% - 56px);
       }
       #editor,
       #preview {
         box-sizing: border-box;
         display: block;
         width: 50% !important;
-        height: 600px !important;
+        height: 100% !important;
         float: left;
         padding: 20px;
       }
@@ -32,7 +37,13 @@
     </style>
   </head>
 
-  <body>
+  <body class="mdui-theme-primary-indigo mdui-theme-accent-pink">
+    <div class="mdui-toolbar mdui-color-theme">
+      <span class="mdui-typo-title">Markdown Editor @memset0</span>
+      <div class="mdui-toolbar-spacer"></div>
+      <a href="javascript:;" id="load-sample" class="mdui-btn">加载示例</a>
+      <a href="https://github.com/memset0/qsctech-problems-upsolving/tree/main/markdown" target="_blank" class="mdui-btn">查看源码</a>
+    </div>
     <div id="markdown">
       <textarea id="editor" class="mdui-textfield-input"></textarea>
       <div id="preview" class="mdui-typo"></div>
@@ -40,9 +51,17 @@
 
     <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
     <script src="https://cdn.bootcss.com/KaTeX/0.10.1/katex.min.js"></script>
+
     <script src="./markdown-editor.js"></script>
+
     <script>
       MDE.install(document.getElementById('editor'), document.getElementById('preview'));
+      document.getElementById('load-sample').addEventListener('click', function () {
+        xmlhttp = new XMLHttpRequest();
+        xmlhttp.open('GET', './sample.md', false);
+        xmlhttp.send();
+        MDE.setContent(xmlhttp.responseText);
+      });
     </script>
   </body>
 </html>
