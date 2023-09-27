@@ -14,7 +14,7 @@ func authMiddleware() gin.HandlerFunc {
 		accessToken := c.PostForm("access_token")
 
 		if _, ok := common.AccessTokenMap[accessToken]; !ok {
-			c.JSON(http.StatusUnauthorized, utils.Rejected(100, "Invalid access token"))
+			c.JSON(http.StatusUnauthorized, utils.Rejected(101, "Invalid access token"))
 			c.Abort()
 		}
 
