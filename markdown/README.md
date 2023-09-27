@@ -2,13 +2,10 @@
 
 [DEMO](https://memset0.github.io/qsctech-problems-upsolving/markdown/)
 
-设计实现一个 Markdown 编辑器。点击右上角 `加载示例` 加载测试代码。
+设计实现一个 Markdown 编辑器。点击右上角 `加载示例` 加载示例文档。
 
-## 支持的 Markdown 语法
+### Features
 
-[x] 段落
-[x] 标题
-[x] 加粗、斜体、行内代码
-[x] 数学公式
-[x] 引用块（blockquote）
-[x] 无序列表
+- 支持常见 Markdown 语法，具体可以参考示例文档中的演示内容。
+- 支持数学公式
+- 支持导出为 HTML、PDF 等常用格式

@@ -271,6 +271,35 @@ window.MarkdownEditor = class {
     this.render();
   }
 
+  exportToHTML() {}
+
+  exportToPdf() {
+    this.render();
+    const html =
+      this.$preview.innerHTML +
+      `
+        <style>
+          html, body { margin: 0 !important; padding: 0 !important; }
+          @page { size: A4; margin: 20px; }
+        </style>
+      `;
+
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const blobUrl = URL.createObjectURL(blob);
+
+    const $iframe = document.createElement('iframe');
+    $iframe.style.display = 'none';
+    $iframe.src = blobUrl;
+    document.body.appendChild($iframe);
+
+    $iframe.onload = () => {
+      setTimeout(() => {
+        $iframe.focus();
+        $iframe.contentWindow.print();
+      }, 1);
+    };
+  }
+
   constructor() {
     this.$editor = null;
     this.$preview = null;
