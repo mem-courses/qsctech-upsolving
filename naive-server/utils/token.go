@@ -7,7 +7,7 @@ import (
 
 var CHARSET = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
-func generate_token(n int) string {
+func GenerateToken(n int) string {
 	rand.Seed(time.Now().Unix())
 	token := make([]rune, n)
 	for i := range token {

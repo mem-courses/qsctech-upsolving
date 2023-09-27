@@ -1,6 +1,11 @@
 package main
 
 import (
+	"net/http"
+	"os"
+	"project/models"
+	"project/utils"
+
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
@@ -9,18 +14,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type User struct {
-	Name     string `json:"name"`
-	Password string `json:"password"`
-}
+var db *gorm.DB
+var logger *logrus.Logger
 
-type Product struct {
-	gorm.Model
-	Code  string
-	Price uint
-}
-
-func resp(data gin.H) gin.H {
+func succ(data gin.H) gin.H {
 	return gin.H{
 		"code": 0,
 		"msg":  "",
@@ -28,31 +25,56 @@ func resp(data gin.H) gin.H {
 	}
 }
 
-func setupDatabase() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("./main.db"), &gorm.Config{})
+func reject(code int, msg string) gin.H {
+	return gin.H{
+		"code": code,
+		"msg":  msg,
+		"data": nil,
+	}
+}
+
+func initLogger() {
+	logger = logrus.New()
+	logger.Formatter = &logrus.JSONFormatter{}
+	logger.Out = os.Stdout
+}
+
+func initDB() {
+	var err error
+	db, err = gorm.Open(sqlite.Open("./main.db"), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
-	db.AutoMigrate(&Product{})
-	return db
+	db.AutoMigrate(&models.User{})
 }
 
 func setupRouter(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
 
 	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, resp(gin.H{
+		c.JSON(200, succ(gin.H{
 			"msg": "pong",
 		}))
 	})
 
 	r.POST("/signin", func(c *gin.Context) {
-		json := User{}
-		c.BindJSON(&json)
-		logrus.Printf("%v", &json)
-		token := utils.generate_token(60)
-		c.JSON(200, resp(gin.H{
-			"access_token": token,
+		var user models.User
+		if err := c.BindJSON(&user); err != nil {
+			logger.Error("Error parsing JSON: ", err)
+			c.JSON(http.StatusBadRequest, reject(100, "Unvalid request"))
+			return
+		}
+
+		var existingUser models.User
+		result := db.Where("username = ?", user.Username).First(&existingUser)
+
+		if result.Error != nil || existingUser.Password != user.Password {
+			c.JSON(http.StatusUnauthorized, reject(101, "Wrong username or password"))
+			return
+		}
+
+		c.JSON(http.StatusOK, succ(gin.H{
+			"access_token": utils.GenerateToken(60),
 		}))
 	})
 
@@ -60,9 +82,9 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 }
 
 func main() {
-	logrus.SetLevel(logrus.TraceLevel)
+	initLogger()
+	initDB()
 
-	db := setupDatabase()
 	r := setupRouter(db)
 	r.Run("127.0.0.1:8080")
 }
