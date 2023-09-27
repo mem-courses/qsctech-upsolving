@@ -275,14 +275,17 @@ window.MarkdownEditor = class {
 
   exportToPdf() {
     this.render();
-    const html =
-      this.$preview.innerHTML +
-      `
-        <style>
-          html, body { margin: 0 !important; padding: 0 !important; }
-          @page { size: A4; margin: 20px; }
-        </style>
-      `;
+    const html = `
+      <div class="mdui-typo">
+        ${this.$preview.innerHTML}
+      </div>
+      <style>
+        html, body { margin: 0 !important; padding: 0 !important; }
+        @page { size: A4; margin: 5em; }
+      </style>
+      <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css"/>
+      <link href="https://cdn.bootcss.com/KaTeX/0.10.1/katex.min.css" rel="stylesheet"/>
+    `;
 
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     const blobUrl = URL.createObjectURL(blob);
