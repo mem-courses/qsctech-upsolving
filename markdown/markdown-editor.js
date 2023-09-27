@@ -201,7 +201,6 @@ window.MarkdownEditor = class {
           result[l].text += result[i].text;
         }
       }
-      console.log(l, r);
       finalResult.push(result[l]);
     }
 
@@ -241,24 +240,30 @@ window.MarkdownEditor = class {
   }
 
   render() {
-    console.log(this._IsRendering, this._NeedRender);
+    console.log('render entrace', this._Rendering, this._NeedRender, this._RenderPromise);
     if (this.$editor === null || this.$preview === null) {
       throw new Error('Markdown Editor is not installed.');
     }
-    if (this._IsRenderinging) {
+    if (this._Rendering) {
       this._NeedRender = true;
-      return;
+      return this._RenderPromise;
     }
-    this._IsRendering = true;
-    do {
-      this._NeedRender = false;
-      const content = this.$editor.value;
-      this.pushToCache(content);
-      const vdomtree = this.renderContent(content.split('\n'));
-      console.log('vdomtree:', vdomtree);
-      this.renderDOM(this.$preview, vdomtree);
-    } while (this._NeedRender);
-    this._IsRendering = false;
+
+    this._Rendering = true;
+    return (this._RenderPromise = new Promise((resolve) => {
+      console.log('render loop', this._Rendering, this._NeedRender, this._RenderPromise);
+      do {
+        this._NeedRender = false;
+        const content = this.$editor.value;
+        this.pushToCache(content);
+        const vdomtree = this.renderContent(content.split('\n'));
+        console.log('vdomtree:', vdomtree);
+        this.renderDOM(this.$preview, vdomtree);
+      } while (this._NeedRender);
+      this._Rendering = false;
+      console.log('render end loop', this._Rendering, this._NeedRender, this._RenderPromise);
+      resolve(this.$preview.innerHTML);
+    }));
   }
 
   install($editor, $preview) {
@@ -271,23 +276,35 @@ window.MarkdownEditor = class {
     this.render();
   }
 
-  exportToHTML() {}
+  async getHTML() {
+    await this.render();
+    let html = '';
+    html += '<div class="mdui-typo">';
+    html += this.$preview.innerHTML;
+    html += '</div>';
+    html += '<style>';
+    html += 'html, body { margin: 0 !important; padding: 0 !important; }';
+    html += '@page { size: A4; margin: 5em; }';
+    html += '</style>';
+    html += '<link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css"/>';
+    html += '<link href="https://cdn.bootcss.com/KaTeX/0.10.1/katex.min.css" rel="stylesheet"/>';
+    return html;
+  }
 
-  exportToPdf() {
-    this.render();
-    const html = `
-      <div class="mdui-typo">
-        ${this.$preview.innerHTML}
-      </div>
-      <style>
-        html, body { margin: 0 !important; padding: 0 !important; }
-        @page { size: A4; margin: 5em; }
-      </style>
-      <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css"/>
-      <link href="https://cdn.bootcss.com/KaTeX/0.10.1/katex.min.css" rel="stylesheet"/>
-    `;
+  async exportToHTML() {
+    const blob = new Blob([await this.getHTML()], { type: 'text/html;charset=utf-8' });
 
-    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const fileName = `export.html`;
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+
+    window.URL.revokeObjectURL(link.href);
+  }
+
+  async exportToPdf() {
+    const blob = new Blob([await this.getHTML()], { type: 'text/html;charset=utf-8' });
     const blobUrl = URL.createObjectURL(blob);
 
     const $iframe = document.createElement('iframe');
