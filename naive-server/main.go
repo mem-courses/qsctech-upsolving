@@ -1,9 +1,6 @@
 package main
 
 import (
-	"math/rand"
-	"time"
-
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
@@ -31,24 +28,16 @@ func resp(data gin.H) gin.H {
 	}
 }
 
-var CHARSET = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-
-func generate_token(n int) string {
-	rand.Seed(time.Now().Unix())
-	token := make([]rune, n)
-	for i := range token {
-		token[i] = CHARSET[rand.Intn(len(CHARSET))]
-	}
-	return string(token)
-}
-
-func setupRouter() *gin.Engine {
-	db, err := gorm.Open(sqlite.Open("../main.db"), &gorm.Config{})
+func setupDatabase() *gorm.DB {
+	db, err := gorm.Open(sqlite.Open("./main.db"), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
 	db.AutoMigrate(&Product{})
+	return db
+}
 
+func setupRouter(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
 
 	r.GET("/ping", func(c *gin.Context) {
@@ -61,7 +50,7 @@ func setupRouter() *gin.Engine {
 		json := User{}
 		c.BindJSON(&json)
 		logrus.Printf("%v", &json)
-		token := generate_token(60)
+		token := utils.generate_token(60)
 		c.JSON(200, resp(gin.H{
 			"access_token": token,
 		}))
@@ -73,6 +62,7 @@ func setupRouter() *gin.Engine {
 func main() {
 	logrus.SetLevel(logrus.TraceLevel)
 
-	r := setupRouter()
+	db := setupDatabase()
+	r := setupRouter(db)
 	r.Run("127.0.0.1:8080")
 }
