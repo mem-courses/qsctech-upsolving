@@ -40,8 +40,13 @@ func Signup(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 
+	if len(password) < 3 || len(password) > 20 {
+		c.JSON(http.StatusOK, utils.Rejected(403, "Username length must be between 3 and 20 characters"))
+		return
+	}
+
 	if len(password) < 8 || len(password) > 32 {
-		c.JSON(http.StatusOK, utils.Rejected(403, "Password length must be between 8 and 32 characters"))
+		c.JSON(http.StatusOK, utils.Rejected(404, "Password length must be between 8 and 32 characters"))
 		return
 	}
 
