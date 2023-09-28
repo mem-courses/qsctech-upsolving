@@ -15,7 +15,7 @@
 
 - 服务端所有的返回值都需要符合以下格式：
 
-  ```json
+  ```javascript
   {
       "code": int,	// 错误码， 非 0 表示失败
       "msg": string,	// 错误描述， 没有错误时为空字符串
@@ -36,7 +36,7 @@
 
 返回值
 
-```json
+```javascript
 {
     "msg": "pong!"
 }
@@ -46,7 +46,7 @@
 
 请求体
 
-```json
+```javascript
 {
     "username": string,
     "password": string
@@ -55,7 +55,7 @@
 
 返回值
 
-```json
+```javascript
 {
     "access_token": string	// 身份验证token
 }
@@ -71,7 +71,7 @@
 
 请求体
 
-```json
+```javascript
 {
     "username": string,
     "password": string
@@ -80,7 +80,7 @@
 
 返回值
 
-```json
+```javascript
 {
     "access_token": string
 }
@@ -96,7 +96,7 @@
 
 请求体
 
-```json
+```javascript
 {
     "access_token": string, 
     "checkword": string
@@ -105,7 +105,7 @@
 
 返回值
 
-```json
+```javascript
 {
     "point": int	// 签到的奖励点数，默认为 1
 }
