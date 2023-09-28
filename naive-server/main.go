@@ -1,7 +1,6 @@
 package main
 
 import (
-	"net/http"
 	"project/common"
 	"project/handlers"
 	"project/utils"
@@ -12,14 +11,20 @@ import (
 func authMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		accessToken := c.PostForm("access_token")
+		common.Logger.Info("=== access token map ===")
+		for key, value := range common.AccessTokenMap {
+			common.Logger.Info(key + ": " + value.Username)
+		}
+		common.Logger.Info("=== access token map ===")
 
 		if _, ok := common.AccessTokenMap[accessToken]; !ok {
-			c.JSON(http.StatusUnauthorized, utils.Rejected(101, "Invalid access token"))
-			c.Abort()
+			c.Set("user", nil)
+		} else {
+			storedUser := common.AccessTokenMap[accessToken]
+			common.Logger.Info("=> " + accessToken + " found user: " + storedUser.Username)
+			c.Set("user", storedUser)
 		}
 
-		storedUser := common.AccessTokenMap[accessToken]
-		c.Set("user", storedUser)
 		c.Next()
 	}
 }
@@ -32,12 +37,15 @@ func main() {
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, utils.Success(gin.H{
-			"msg": "pong",
+			"msg": "pong!",
 		}))
 	})
 
+	r.POST("/signup", handlers.Signup)
 	r.POST("/signin", handlers.Signin)
 	r.Use(authMiddleware())
+
+	r.POST("/checkin", handlers.Checkin)
 
 	r.Run("127.0.0.1:8080")
 }

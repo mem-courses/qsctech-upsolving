@@ -3,3 +3,7 @@ main.db
 # golang
 tmp
 *.exe
+
+# python
+__pycache__
+*.pyc

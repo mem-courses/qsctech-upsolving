@@ -50,7 +50,7 @@ def test_ping(test_readConfig):
     assert resp.status_code == requests.codes.ok
     respJson = resp.json()
     assert respJson['code'] == 0
-    assert respJson['msg'] == 'pong!'
+    assert respJson['data']['msg'] == 'pong!'
 
 class TestSignin:
     ''' 测试登录接口 '''
@@ -76,6 +76,8 @@ class TestSignin:
         data = {'username': user[0], 'password': 'kk'}
 
         resp = requests.post(self.url, data=data, timeout=1)
+        print(resp.status_code)
+        print(resp.json())
         assert resp.status_code == requests.codes.ok
         respJson = resp.json()
         assert respJson['code'] != 0

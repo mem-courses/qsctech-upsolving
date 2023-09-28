@@ -24,7 +24,7 @@ func Signin(c *gin.Context) {
 	}).Info("signin")
 
 	if result.Error != nil || existingUser.Password != password {
-		c.JSON(http.StatusUnauthorized, utils.Rejected(401, "Wrong username or password"))
+		c.JSON(http.StatusOK, utils.Rejected(401, "Wrong username or password"))
 		return
 	}
 
@@ -41,14 +41,14 @@ func Signup(c *gin.Context) {
 	password := c.PostForm("password")
 
 	if len(password) < 8 || len(password) > 32 {
-		c.JSON(http.StatusBadRequest, utils.Rejected(403, "Password length must be between 8 and 32 characters"))
+		c.JSON(http.StatusOK, utils.Rejected(403, "Password length must be between 8 and 32 characters"))
 		return
 	}
 
 	var existingUser models.User
 	result := common.DB.Where("username = ?", username).First(&existingUser)
 	if result.RowsAffected > 0 {
-		c.JSON(http.StatusBadRequest, utils.Rejected(402, "Username already exists"))
+		c.JSON(http.StatusOK, utils.Rejected(402, "Username already exists"))
 		return
 	}
 
