@@ -11,19 +11,26 @@ import (
 )
 
 const LOGIN_API = "https://zjuam.zju.edu.cn/cas/login"
+const SECKEY_API = "https://zjuam.zju.edu.cn/cas/v2/getPubKey"
+const CONFIG_PATH = "config.json"
 
 type Config struct {
 	Username string
 	Password string
 }
 
+type SecKey struct {
+	Modulus  string
+	Exponent string
+}
+
 func loadUserFromConfig(username *string, password *string) bool {
-	_, err := os.Stat("config.json")
+	_, err := os.Stat(CONFIG_PATH)
 	if os.IsNotExist(err) {
 		return false
 	}
 
-	file, err := os.Open("config.json")
+	file, err := os.Open(CONFIG_PATH)
 	if err != nil {
 		fmt.Println("Failed to open `config.json`:", err)
 		return false
@@ -61,8 +68,8 @@ func main() {
 	}
 	fmt.Println("Login with username =", username, "password =", password)
 
-	// GET 登录页面，获取 execution
 	resp, err := client.R().Get(LOGIN_API)
+	fmt.Println("Headers:", resp.Header())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -70,21 +77,50 @@ func main() {
 	execution := resp.String()
 	execution = strings.Split(execution, "<input type=\"hidden\" name=\"execution\" value=\"")[1]
 	execution = strings.Split(execution, "\" />")[0]
-	// fmt.Println("excution", execution)
+	// fmt.Println("execution", execution)
+
+	resp, err = client.R().Get(SECKEY_API)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	secKeyJson := resp.String()
+	var secKey SecKey
+	err = json.Unmarshal([]byte(secKeyJson), &secKey)
+	if err != nil {
+		log.Fatal(err)
+	}
+	exponent := secKey.Exponent
+	modulus := secKey.Modulus
+	fmt.Println("exponent:", exponent)
+	fmt.Println("modulus:", modulus)
+
+	// reversedPassword := ReverseString(password)
+	// privKey := NewRSAKeyPair(exponent, modulus)
+	// encryptedPassword, err := EncryptedString(&privKey.PublicKey, reversedPassword)
+	encryptedPassword, err := SolveEncryptPassword(exponent, modulus, password)
+	fmt.Println("encrypted password:", encryptedPassword)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	postBody := map[string]interface{}{
 		"username":  username,
-		"password":  password,
+		"password":  encryptedPassword,
 		"execution": execution,
 		"_eventId":  "submit",
 		"authcode":  "",
 	}
-	postJson, err := json.Marshal(&postBody)
+	postBytes, err := json.Marshal(&postBody)
+	postJson := string(postBytes)
+	fmt.Println("post json:", postJson)
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	resp, err = client.R().SetBody(postJson).Post(LOGIN_API)
+	fmt.Println("Headers:", resp.Header())
 	if err != nil {
 		log.Fatal(err)
 	}
