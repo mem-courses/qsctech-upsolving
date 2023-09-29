@@ -8,3 +8,5 @@ tmp
 __pycache__
 *.pyc
 zjuam/config.json
+zjuam/login.html
+zjuam/security.test.js

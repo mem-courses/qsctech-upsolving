@@ -8,7 +8,7 @@ import (
 )
 
 func NewRSAKeyPair(exponentString, modulusString string) *rsa.PrivateKey {
-	exponent, _ := new(big.Int).SetString(exponentString, 10)
+	exponent, _ := new(big.Int).SetString(exponentString, 16)
 	modulus, _ := new(big.Int).SetString(modulusString, 16)
 
 	privKey := &rsa.PrivateKey{

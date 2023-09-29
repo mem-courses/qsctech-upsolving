@@ -674,7 +674,14 @@ var modulus = '{{modulus}}';
 var password = '{{password}}';
 
 var key = new RSAUtils.getKeyPair(exponent, '', modulus);
-var reversedPwd = password.split().reverse().join('');
+var reversedPwd = password.split('').reverse().join('');
 var encryptedPwd = RSAUtils.encryptedString(key, reversedPwd);
 
+console.log(JSON.stringify({
+  exponent,
+  modulus,
+  password,
+  reversedPwd,
+  encryptedPwd
+}));
 console.log(encryptedPwd);

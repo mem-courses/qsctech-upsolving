@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"strings"
 
@@ -23,7 +24,7 @@ func SolveEncryptPassword(exponent, modulus, password string) (string, error) {
 	var result string
 	console := make(map[string]interface{})
 	console["log"] = func(msg string) {
-		// fmt.Println("Console.log:", msg)
+		fmt.Println("JS stdout:", msg)
 		result = msg
 	}
 	vm.Set("console", console)
