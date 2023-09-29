@@ -197,7 +197,11 @@ window.MarkdownEditor = class {
           ++r;
         }
         for (let i = l + 1; i <= r; i++) {
-          result[l].text += '<br>';
+          if (result[i - 1].text.endsWith('  ')) {
+            result[l].text = result[l].text.slice(0, -2) + '<br>';
+          } else {
+            result[l].text += ' ';
+          }
           result[l].text += result[i].text;
         }
       }
