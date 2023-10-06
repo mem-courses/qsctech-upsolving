@@ -1,6 +1,6 @@
 # Markdown
 
-[DEMO](https://memset0.github.io/qsctech-problems-upsolving/markdown/)
+[DEMO](https://mem-courses.github.io/qsctech-upsolving/markdown/)
 
 设计实现一个 Markdown 编辑器。点击右上角 `加载示例` 加载示例文档。
 
